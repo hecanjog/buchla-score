@@ -1,10 +1,11 @@
 from pippi import dsp
 from noise import pnoise1
+import seq
 
 freqs = [200, 350, 500, 700, 1000, 1400, 2000, 3500]
 
-bpm = 50.0
-beat = dsp.bpm2frames(bpm)
+bpm = 100.0
+beat = int(dsp.bpm2frames(bpm) * 0.25)
 
 nump = 100
 
@@ -29,16 +30,17 @@ def make_vary(index, length, freq):
 
     return snd
 
+p = 'XxxXxxxXxXxxXxxxxXx'
 
-def make_layer(freq):
-    out = ''
+beats = seq.toFrames(p, beat) * 100
 
-    for i in range(nump):
-        out += make_vary(i, beat, freq)
+layers = []
 
-    return out
+for l in range(2):
+    beats = dsp.rotate(beats, dsp.randint(50, 100))
+    layers += [ ''.join([ make_pulse(dsp.tone(length, freqs[i % len(freqs)], amp=dsp.rand(0.1, 0.5))) for i, length in enumerate(beats) ]) ]
 
-out = dsp.mix([ make_layer(freq) for freq in freqs ])
+out = dsp.mix(layers)
 
 dsp.write(out, 'buchla-perlin')
 

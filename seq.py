@@ -1,26 +1,21 @@
 from pippi import dsp
 
-p = 'XxxxXxxxXxxxxXx'
+def toFrames(seq, beat):
+    notelength = 0
+    notes = []
+    lastnote = 'x'
 
-beat = dsp.bpm2frames(100)
+    for i, b in enumerate(seq):
+        if b == 'X' and lastnote == 'x' and notelength > 0:
+            notes += [ notelength ]
+            notelength = beat
+        else:
+            notelength += beat
 
-length = len(p) * beat
+        if i == len(seq) - 1:
+            notes += [ notelength ]
 
-notelength = 0
-notes = []
-lastnote = 'x'
+        lastnote = b
 
-for i, b in enumerate(p):
-    if b == 'X' and lastnote == 'x' and notelength > 0:
-        notes += [ notelength ]
-        notelength = beat
-    else:
-        notelength += beat
-
-    if i == len(p) - 1:
-        notes += [ notelength ]
-
-    lastnote = b
-
-print notes
+    return notes
 
